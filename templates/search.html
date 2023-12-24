@@ -6,7 +6,6 @@
     <title>Search</title>
     <style>
         body, html {
-            height: 100%;
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #000;
@@ -14,66 +13,57 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            padding-top: 20px; /* Dodano górne wypełnienie */
         }
         .search-form {
             width: 100%;
             max-width: 400px;
-            padding: 40px;
+            padding: 20px; /* Zmniejszono wypełnienie */
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
-        .search-form input[type="text"] {
+        .search-form input[type="text"], .search-form input[type="submit"] {
             width: calc(100% - 20px);
             padding: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* Zmniejszono margines */
             background: #333;
             border: 1px solid #444;
             color: #fff;
             border-radius: 5px;
             box-sizing: border-box;
         }
-        .search-form input[type="text"]:focus {
+        .search-form input[type="text"]:focus, .search-form input[type="submit"]:focus {
             outline: none;
             border-color: #555;
         }
         .search-form input[type="submit"] {
-            width: calc(100% - 20px);
-            padding: 10px;
             background: #222;
-            border: 1px solid #444;
-            color: #fff;
-            border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        .search-form input[type="submit"]:hover, 
-        .search-form input[type="submit"]:focus {
+        .search-form input[type="submit"]:hover {
             background-color: #0a0a0a;
-            outline: none;
         }
         .results-container {
-            display: flex;
-            justify-content: center; /* Center the results container */
             width: 100%;
-            padding: 20px; /* Add some padding around the results container */
+            max-width: 600px;
+            padding: 20px;
+            margin-top: 10px; /* Zmniejszono margines */
         }
         .results {
-            background: #1c1c1c; /* Dark grey background for the results */
-            color: #fff;
-            padding: 20px;
+            background: #1c1c1c;
+            padding: 15px; /* Zmniejszono wypełnienie */
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            margin-top: 20px;
-            display: none; /* Initially not displayed */
-            white-space: pre-wrap; /* To ensure formatting of preformatted text is respected */
-            word-wrap: break-word; /* To prevent the content from spilling out */
-            max-width: 80%; /* Maximum width to prevent it from getting too wide */
+            display: none; /* Początkowo ukryte */
+            overflow: auto; /* Dodano przewijanie dla dużych wyników */
         }
         .results.visible {
-            display: block; /* Show results if there are any */
+            display: block;
+        }
+        .result-item {
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -83,13 +73,24 @@
             <input type="text" name="nickname" placeholder="Enter a nickname" required>
             <input type="submit" value="Search">
         </form>
-        <div class="results-container">
-            <!-- The 'results' div will only be displayed if there are results to show -->
-            <div class="results{% if results %} visible{% endif %}">
-                {% if results %}
-                    <p>{{ results }}</p>
-                {% endif %}
+    </div>
+    <div class="results-container">
+        {% if results %}
+            <div class="results visible">
+                {% for result in results %}
+                    <div class="result-item">
+                        <p>Name: {{ result['name'] }}</p>
+                        <p>IP: {{ result.get('ip', 'Not available') }}</p>
+                        <p>Email: {{ result.get('email', 'Not available') }}</p>
+                        <p>Server: {{ result.get('server', 'Not available') }}</p>
+                    </div>
+                {% endfor %}
             </div>
-        </div>
-    </body>
-    </html>
+        {% else %}
+            <div class="results visible">
+                <p>No results found.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
