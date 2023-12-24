@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-form {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .search-form input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            background: #333;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .search-form input[type="text"]:focus {
+            outline: none;
+            border-color: #555;
+        }
+        .search-form input[type="submit"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .search-form input[type="submit"]:hover, 
+        .search-form input[type="submit"]:focus {
+            background-color: #0a0a0a;
+            outline: none;
+        }
+        .results-container {
+            display: flex;
+            justify-content: center; /* Center the results container */
+            width: 100%;
+            padding: 20px; /* Add some padding around the results container */
+        }
+        .results {
+            background: #1c1c1c; /* Dark grey background for the results */
+            color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+            display: none; /* Initially not displayed */
+            white-space: pre-wrap; /* To ensure formatting of preformatted text is respected */
+            word-wrap: break-word; /* To prevent the content from spilling out */
+            max-width: 80%; /* Maximum width to prevent it from getting too wide */
+        }
+        .results.visible {
+            display: block; /* Show results if there are any */
+        }
+    </style>
+</head>
+<body>
+    <div class="search-form">
+        <form action="/search" method="get">
+            <input type="text" name="nickname" placeholder="Enter a nickname" required>
+            <input type="submit" value="Search">
+        </form>
+        <div class="results-container">
+            <!-- The 'results' div will only be displayed if there are results to show -->
+            <div class="results{% if results %} visible{% endif %}">
+                {% if results %}
+                    <p>{{ results }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </body>
+    </html>
