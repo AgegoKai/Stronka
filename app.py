@@ -43,9 +43,14 @@ def query_api(nickname):
     try:
         response = requests.post(url, headers=headers)
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        if data['status'] == 'ok':
+            return data['results']
+        else:
+            return f"Error in response: {data.get('status')}"
     except requests.RequestException as e:
         return f"API Error: {e}"
+
 
 if __name__ == '__main__':
     app.run(debug=True)
