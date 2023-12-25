@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Login</title>
+    <meta charset="utf-8">
     <style>
-        body, html {
+        body,
+        html {
             height: 100%;
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,13 +16,15 @@
             justify-content: center;
             color: #fff;
         }
+        
         .login-form {
             width: 100%;
             max-width: 400px;
             padding: 40px;
             box-sizing: border-box;
         }
-        .login-form input[type="text"], 
+        
+        .login-form input[type="text"],
         .login-form input[type="password"] {
             width: calc(100% - 20px);
             padding: 10px;
@@ -29,12 +34,15 @@
             color: #fff;
             border-radius: 5px;
             box-sizing: border-box;
+            text-align: center;
         }
-        .login-form input[type="text"]:focus, 
+        
+        .login-form input[type="text"]:focus,
         .login-form input[type="password"]:focus {
             outline: none;
             border-color: #555;
         }
+        
         .login-form input[type="submit"] {
             width: calc(100% - 20px);
             padding: 10px;
@@ -45,23 +53,26 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        .login-form input[type="submit"]:hover, 
+        
+        .login-form input[type="submit"]:hover,
         .login-form input[type="submit"]:focus {
-            background-color: #0a0a0a;
+            background-color: #1f1f1f;
             outline: none;
         }
+        
         .login-form input::placeholder {
             color: #bbb;
         }
     </style>
 </head>
+
 <body>
     <div class="login-form">
         <form action="/login" method="post">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <input type="submit" value="Login">
+            <input type="text" name="license_key" placeholder="License Key" required>
+            <input type="submit" value="Confirm">
         </form>
     </div>
 </body>
+
 </html>
