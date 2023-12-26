@@ -1,48 +1,25 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import os
-import requests
-
+import redis
 
 app = Flask(__name__)
-app.secret_key = 'G&:<2/_xLKR9v|0&Em/9m(>P,z&Q;~'  # Replace with a random key for security
+app.secret_key = 'G&:<2/_xLKR9v|0&Em/9m(>P,z&Q;~'
 
-# Folder where the license keys are stored
 KEYS_FOLDER = 'keys'
-
-# Dictionary to track used license keys and their associated IPs
+DATABASE_KEY = 'user_database'
 licenses_in_use = {}
 
-@app.route('/')
-def home():
-    return render_template('login.html')
+# Redis Configuration
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
+redis_client = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
-@app.route('/login', methods=['POST'])
-def login():
-    license_key = request.form['license_key']
-    user_ip = request.remote_addr  # Get user's IP address
-
-    if check_license(license_key, user_ip):
-        session['logged_in'] = True  # Set session for logged-in user
-        return redirect(url_for('search'))
-    return redirect(url_for('home'))
-
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)  # Remove 'logged_in' from session
-    return redirect(url_for('home'))
-
-@app.route('/search')
-def search():
-    nickname = request.args.get('nickname', None)
-    results = []
-    if nickname:
-        # Perform the search and populate the results
-        response_data = query_api(nickname)
-        if response_data['status'] == 'ok':
-            results = response_data['results']
-
-    return render_template('search.html', nickname=nickname, results=results)
-
+# Load data from the file into Redis
+with open('TUTAJ PATH DO DB', 'r') as file:
+    for line in file:
+        nickname, ip_address = line.strip().split(':')
+        redis_client.hset(DATABASE_KEY, nickname, f'{nickname}:{ip_address}')
 
 def check_license(key, user_ip):
     global licenses_in_use
@@ -72,21 +49,45 @@ def is_valid_license(key):
 
     return False
 
-def query_api(nickname):
-    if not session.get('logged_in'):  # Sprawdź, czy użytkownik jest zalogowany
-        return "Unauthorized access to the API."
+def query_database(nickname):
+    user_data = redis_client.hget(DATABASE_KEY, nickname)
+    return user_data
 
-    url = "http://duny.demolishmc.net/api/search"
-    headers = {
-        'key': '381O-23VT-NR7R-I6AT',  # Klucz API
-        'user': nickname
-    }
-    try:
-        response = requests.post(url, headers=headers)
-        response.raise_for_status()  # Sprawdź, czy odpowiedź jest sukcesem
-        return response.json()  # Zwróć odpowiedź w formacie JSON
-    except requests.RequestException as e:
-        return f"API Error: {e}"
+@app.route('/')
+def home():
+    return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def login():
+    license_key = request.form['license_key']
+    user_ip = request.remote_addr
+
+    if check_license(license_key, user_ip):
+        session['logged_in'] = True
+        return redirect(url_for('search'))
+    flash('Invalid license key or already in use.')
+    return redirect(url_for('home'))
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('home'))
+
+@app.route('/search')
+def search():
+    if 'logged_in' not in session or not session['logged_in']:
+        return redirect(url_for('home'))
+
+    nickname = request.args.get('nickname', None)
+    ip_address = None
+    
+    if nickname:
+        result_data = query_database(nickname)
+        if result_data:
+            # Extract the IP address from the result data
+            ip_address = result_data.decode('utf-8').split(':')[1]
+
+    return render_template('search.html', nickname=nickname, results=[{'ip': ip_address}])
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
